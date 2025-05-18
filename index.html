@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokenMaker 98</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/98.css/0.1.20/98.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-storage-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-firestore-compat.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #008080;
+            font-family: "MS Sans Serif", sans-serif;
+            height: 100vh;
+            user-select: none;
+        }
+        
+        .desktop {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 35px);
+            overflow: auto;
+        }
+        
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 35px;
+            background-color: silver;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            box-shadow: inset 1px 0 #fff, inset 0 1px #fff, inset -1px 0 #0a0a0a, inset 0 -1px #0a0a0a;
+            z-index: 1000;
+        }
+        
+        .start-button {
+            display: flex;
+            align-items: center;
+            height: 28px;
+            padding: 0 5px;
+            margin-right: 10px;
+            background-color: silver;
+            cursor: pointer;
+            box-shadow: inset 1px 1px #fff, inset -1px -1px #0a0a0a;
+        }
+        
+        .start-button:active {
+            box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff;
+        }
+        
+        .start-button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 3px;
+        }
+        
+        .start-menu {
+            position: absolute;
+            bottom: 35px;
+            left: 0;
+            width: 200px;
+            background-color: silver;
+            border: 1px solid #000;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1001;
+        }
+        
+        .start-menu.active {
+            display: block;
+        }
+        
+        .start-menu-item {
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .start-menu-item:hover {
+            background-color: #000080;
+            color: white;
+        }
+        
+        .start-menu-item img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        
+        .desktop-icon {
+            width: 70px;
+            text-align: center;
+            margin: 15px;
+            float: left;
+            cursor: pointer;
+        }
+        
+        .desktop-icon img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+        
+        .desktop-icon p {
+            margin: 0;
+            color: white;
+            text-shadow: 1px 1px 1px #000;
+            font-size: 12px;
+        }
+        
+        .window {
+            position: absolute;
+            background-color: silver;
+            border: 1px solid #000;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            min-width: 300px;
+            min-height: 200px;
+            display: none;
+            resize: both;
+            overflow: auto;
+        }
+        
+        .window.active {
+            display: block;
+            z-index: 10;
+        }
+        
+        .window-header {
+            background-color: #000080;
+            color: white;
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+        
+        .window-title {
+            margin: 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .window-controls {
+            display: flex;
+        }
+        
+        .window-control {
+            width: 16px;
+            height: 16px;
+            background-color: silver;
+            margin-left: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: inset 1px 1px #fff, inset -1px -1px #0a0a0a;
+        }
+        
+        .window-control:active {
+            box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff;
+        }
+        
+        .window-content {
+            padding: 10px;
+            height: calc(100% - 55px);
+            overflow: auto;
+        }
+        
+        .window-nav {
+            background-color: silver;
+            border-bottom: 1px solid #000;
+            padding: 3px 5px;
+        }
+        
+        .window-nav-button {
+            background-color: silver;
+            border: 1px solid #0a0a0a;
+            box-shadow: inset 1px 1px #fff, inset -1px -1px #0a0a0a;
+            padding: 2px 5px;
+            margin-right: 5px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .window-nav-button:active {
+            box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff;
+        }
+        
+        /* TokenMaker Window */
+        .upload-area {
+            border: 2px dashed #0a0a0a;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .upload-progress {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        /* Memecoin Queue Window */
+        .queue-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            margin-top: 20px;
+        }
+        
+        .queue-item {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%; /* Square aspect ratio */
+            background-color: #c0c0c0;
+            border: 1px solid #0a0a0a;
+        }
+        
+        .queue-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .queue-number {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 10px;
+            padding: 2px;
+            z-index: 1;
+        }
+
+        .processing-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .processing-dialog {
+            width: 300px;
+            background-color: silver;
+            border: 1px solid #000;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            padding: 15px;
+        }
+
+        .processing-dialog h2 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+
+        .processing-progress {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .processing-status {
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        /* Dialog */
+        .dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: silver;
+            border: 1px solid #000;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            padding: 15px;
+            min-width: 250px;
+        }
+        
+        .dialog.active {
+            display: block;
+        }
+        
+        .dialog-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .dialog-content {
+            margin-bottom: 15px;
+        }
+        
+        .dialog-buttons {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .dialog-button {
+            margin: 0 5px;
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop" id="desktop">
+        <!-- Desktop Icon -->
+        <div class="desktop-icon" onclick="openWindow('tokenmaker')">
+            <img src="https://img.icons8.com/fluency/96/floppy-disk.png" alt="TokenMaker 98">
+            <p>TokenMaker 98</p>
+        </div>
+    </div>
+    
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button" onclick="toggleStartMenu()">
+            <img src="https://img.icons8.com/color/96/windows-95.png" alt="Start">
+            <span>Start</span>
+        </div>
+        <div id="taskbar-items"></div>
+    </div>
+    
+    <!-- Start Menu -->
+    <div class="start-menu" id="start-menu">
+        <div class="start-menu-item" onclick="openWindow('queue'); toggleStartMenu();">
+            <img src="https://img.icons8.com/ios-filled/50/queue.png" alt="Queue">
+            <span>Memecoin Queue</span>
+        </div>
+    </div>
+    
+    <!-- TokenMaker Window -->
+    <div class="window" id="tokenmaker-window">
+        <div class="window-header">
+            <div class="window-title">TokenMaker 98</div>
+            <div class="window-controls">
+                <div class="window-control" onclick="minimizeWindow('tokenmaker')">_</div>
+                <div class="window-control" onclick="maximizeWindow('tokenmaker')">□</div>
+                <div class="window-control" onclick="closeWindow('tokenmaker')">×</div>
+            </div>
+        </div>
+        <div class="window-nav">
+            <button class="window-nav-button">File</button>
+            <button class="window-nav-button">Edit</button>
+            <button class="window-nav-button">Help</button>
+        </div>
+        <div class="window-content">
+            <h2>Create Your Memecoin</h2>
+            <p>Upload an image to tokenize it as a memecoin on the Solana blockchain.</p>
+            <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+                <p>Click here to upload an image</p>
+                <input type="file" id="file-input" style="display: none" accept="image/*" onchange="handleFileUpload(event)">
+            </div>
+            <div class="upload-info">
+                <p><strong>Name your memecoin:</strong></p>
+                <input type="text" class="window-input" id="memecoin-name" placeholder="Enter a name">
+                <p><strong>Ticker symbol:</strong></p>
+                <input type="text" class="window-input" id="memecoin-ticker" placeholder="Enter ticker (e.g. BTC)" maxlength="5">
+            </div>
+            <button class="window-nav-button" onclick="startTokenization()" style="margin-top: 15px;">Create Memecoin</button>
+        </div>
+    </div>
+    
+    <!-- Memecoin Queue Window -->
+    <div class="window" id="queue-window">
+        <div class="window-header">
+            <div class="window-title">Memecoin Queue</div>
+            <div class="window-controls">
+                <div class="window-control" onclick="minimizeWindow('queue')">_</div>
+                <div class="window-control" onclick="maximizeWindow('queue')">□</div>
+                <div class="window-control" onclick="closeWindow('queue')">×</div>
+            </div>
+        </div>
+        <div class="window-nav">
+            <button class="window-nav-button">View</button>
+            <button class="window-nav-button">Refresh</button>
+        </div>
+        <div class="window-content">
+            <h2>Current Memecoin Queue</h2>
+            <p>Images are processed in the order they were submitted. Current queue length: <span id="queue-count">0</span></p>
+            <div class="queue-grid" id="queue-grid">
+                <!-- Queue items will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay" id="processing-overlay">
+        <div class="processing-dialog">
+            <h2>Processing Your Memecoin</h2>
+            <div class="processing-status" id="processing-status">Initializing blockchain connection...</div>
+            <progress class="processing-progress" id="processing-progress" value="0" max="100"></progress>
+            <div style="text-align: center;">
+                <button class="window-nav-button" onclick="document.getElementById('processing-overlay').style.display = 'none';" id="processing-done-button" disabled>Please wait...</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Dialog -->
+    <div class="dialog" id="success-dialog">
+        <div class="dialog-title">Success!</div>
+        <div class="dialog-content">
+            Your image has been successfully queued for tokenization. It will be minted as a memecoin shortly.
+        </div>
+        <div class="dialog-buttons">
+            <button class="window-nav-button dialog-button" onclick="hideDialog('success-dialog')">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Firebase
+        // Replace with your own Firebase config after setting it up
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "your-app.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "your-messaging-sender-id",
+            appId: "your-app-id"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+        const db = firebase.firestore();
+        
+        // Window management
+        let activeWindows = {};
+        let zIndex = 10;
+        
+        function openWindow(windowId) {
+            const windowElement = document.getElementById(`${windowId}-window`);
+            windowElement.style.display = 'block';
+            windowElement.style.zIndex = ++zIndex;
+            
+            // Set default position if not already set
+            if (!windowElement.style.top) {
+                windowElement.style.top = '50px';
+                windowElement.style.left = '50px';
+            }
+            
+            activeWindows[windowId] = true;
+        }
+        
+        function closeWindow(windowId) {
+            document.getElementById(`${windowId}-window`).style.display = 'none';
+            delete activeWindows[windowId];
+        }
+        
+        function minimizeWindow(windowId) {
+            document.getElementById(`${windowId}-window`).style.display = 'none';
+        }
+        
+        function maximizeWindow(windowId) {
+            const windowElement = document.getElementById(`${windowId}-window`);
+            if (windowElement.style.width === '100%') {
+                windowElement.style.width = '600px';
+                windowElement.style.height = '400px';
+                windowElement.style.top = '50px';
+                windowElement.style.left = '50px';
+            } else {
+                windowElement.style.width = '100%';
+                windowElement.style.height = 'calc(100% - 35px)';
+                windowElement.style.top = '0';
+                windowElement.style.left = '0';
+            }
+        }
+        
+        // Make windows draggable
+        const windows = document.querySelectorAll('.window');
+        
+        windows.forEach(window => {
+            const header = window.querySelector('.window-header');
+            let isDragging = false;
+            let offsetX, offsetY;
+            
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                offsetX = e.clientX - window.getBoundingClientRect().left;
+                offsetY = e.clientY - window.getBoundingClientRect().top;
+                window.style.zIndex = ++zIndex;
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                window.style.left = (e.clientX - offsetX) + 'px';
+                window.style.top = (e.clientY - offsetY) + 'px';
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        });
+        
+        // Start menu
+        function toggleStartMenu() {
+            document.getElementById('start-menu').classList.toggle('active');
+        }
+        
+        // Hide start menu when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.start-button') && !e.target.closest('.start-menu')) {
+                document.getElementById('start-menu').classList.remove('active');
+            }
+        });
+        
+        // File upload handling
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Display the selected image in the upload area
+            const uploadArea = document.getElementById('upload-area');
+            uploadArea.innerHTML = '';
+            
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '200px';
+            uploadArea.appendChild(img);
+            
+            const p = document.createElement('p');
+            p.textContent = file.name;
+            uploadArea.appendChild(p);
+        }
+        
+        // Tokenization process
+        function startTokenization() {
+            const fileInput = document.getElementById('file-input');
+            const nameInput = document.getElementById('memecoin-name');
+            const tickerInput = document.getElementById('memecoin-ticker');
+            
+            if (!fileInput.files[0]) {
+                alert('Please select an image first.');
+                return;
+            }
+            
+            if (!nameInput.value) {
+                alert('Please enter a name for your memecoin.');
+                return;
+            }
+            
+            if (!tickerInput.value) {
+                alert('Please enter a ticker symbol for your memecoin.');
+                return;
+            }
+
+            // Show processing overlay
+            const overlay = document.getElementById('processing-overlay');
+            overlay.style.display = 'flex';
+            
+            // Simulate processing
+            simulateProcessing()
+                .then(() => {
+                    // Upload to Firebase
+                    return uploadToFirebase(fileInput.files[0], nameInput.value, tickerInput.value);
+                })
+                .then(() => {
+                    // Show success dialog
+                    hideDialog('success-dialog');
+                    document.getElementById('success-dialog').style.display = 'block';
+                    
+                    // Reset form
+                    fileInput.value = '';
+                    nameInput.value = '';
+                    tickerInput.value = '';
+                    document.getElementById('upload-area').innerHTML = '<p>Click here to upload an image</p>';
+                    
+                    // Refresh queue
+                    loadQueueFromFirebase();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
+        
+        // Simulate processing with progress updates
+        function simulateProcessing() {
+            return new Promise((resolve) => {
+                const progress = document.getElementById('processing-progress');
+                const status = document.getElementById('processing-status');
+                const doneButton = document.getElementById('processing-done-button');
+                
+                const steps = [
+                    { value: 10, message: 'Connecting to Solana blockchain...' },
+                    { value: 25, message: 'Generating smart contract...' },
+                    { value: 40, message: 'Creating token metadata...' },
+                    { value: 60, message: 'Allocating token supply...' },
+                    { value: 75, message: 'Verifying on-chain data...' },
+                    { value: 90, message: 'Finalizing tokenization...' },
+                    { value: 100, message: 'Memecoin successfully queued!' }
+                ];
+                
+                let currentStep = 0;
+                
+                const interval = setInterval(() => {
+                    if (currentStep < steps.length) {
+                        progress.value = steps[currentStep].value;
+                        status.textContent = steps[currentStep].message;
+                        currentStep++;
+                    } else {
+                        clearInterval(interval);
+                        doneButton.disabled = false;
+                        doneButton.textContent = 'Done';
+                        resolve();
+                    }
+                }, 500);
+            });
+        }
+        
+        // Upload to Firebase
+        function uploadToFirebase(file, name, ticker) {
+            return new Promise((resolve, reject) => {
+                const timestamp = new Date().getTime();
+                const storageRef = storage.ref(`memecoins/${timestamp}_${file.name}`);
+                
+                // Upload file
+                const uploadTask = storageRef.put(file);
+                
+                uploadTask.on('state_changed', 
+                    null,
+                    (error) => {
+                        console.error('Upload error:', error);
+                        reject(error);
+                    },
+                    () => {
+                        // Get download URL
+                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                            // Save to Firestore
+                            db.collection('memecoins').add({
+                                name: name,
+                                ticker: ticker,
+                                imageUrl: downloadURL,
+                                timestamp: timestamp,
+                                status: 'queued'
+                            })
+                            .then(() => {
+                                resolve();
+                            })
+                            .catch((error) => {
+                                console.error('Firestore error:', error);
+                                reject(error);
+                            });
+                        });
+                    }
+                );
+            });
+        }
+        
+        // Load queue from Firebase
+        function loadQueueFromFirebase() {
+            const queueGrid = document.getElementById('queue-grid');
+            const queueCount = document.getElementById('queue-count');
+            
+            // Clear current grid
+            queueGrid.innerHTML = '';
+            
+            // Get queue items from Firestore
+            db.collection('memecoins')
+                .orderBy('timestamp', 'desc')
+                .limit(100)
+                .get()
+                .then((querySnapshot) => {
+                    queueCount.textContent = querySnapshot.size;
+                    
+                    querySnapshot.forEach((doc, index) => {
+                        const data = doc.data();
+                        
+                        const queueItem = document.createElement('div');
+                        queueItem.className = 'queue-item';
+                        
+                        const img = document.createElement('img');
+                        img.src = data.imageUrl;
+                        queueItem.appendChild(img);
+                        
+                        const number = document.createElement('div');
+                        number.className = 'queue-number';
+                        number.textContent = index + 1;
+                        queueItem.appendChild(number);
+                        
+                        queueGrid.appendChild(queueItem);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error getting queue:', error);
+                });
+        }
+        
+        // Dialogs
+        function hideDialog(dialogId) {
+            document.getElementById(dialogId).style.display = 'none';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Open TokenMaker by default
+            openWindow('tokenmaker');
+            
+            // Load queue
+            loadQueueFromFirebase();
+        });
+    </script>
+</body>
+</html>
