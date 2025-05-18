@@ -212,7 +212,57 @@
         /* Memecoin Queue Window */
         .queue-grid {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
+            grid-template-columns: repeat(20, 1fr);
+            gap: 2px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .queue-item {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%; /* Square aspect ratio */
+            background-color: #c0c0c0;
+            border: 1px solid #0a0a0a;
+        }
+        
+        .queue-item.filled img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .queue-item.empty {
+            background-color: #e0e0e0;
+            border: 1px dotted #666;
+        }
+        
+        .queue-item .queue-position {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            font-size: 8px;
+            color: #444;
+        }
+        
+        .queue-number {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 10px;
+            padding: 2px;
+            z-index: 1;
+        }
+        
+        /* Memecoin Queue Window */
+        .queue-grid {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
             gap: 2px;
             margin-top: 20px;
         }
@@ -225,13 +275,26 @@
             border: 1px solid #0a0a0a;
         }
         
-        .queue-item img {
+        .queue-item.filled img {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        
+        .queue-item.empty {
+            background-color: #e0e0e0;
+            border: 1px dotted #666;
+        }
+        
+        .queue-item .queue-position {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            font-size: 8px;
+            color: #444;
         }
         
         .queue-number {
@@ -395,7 +458,7 @@
         </div>
         <div class="window-content">
             <h2>Current Memecoin Queue</h2>
-            <p>Images are processed in the order they were submitted. Current queue length: <span id="queue-count">0</span></p>
+            <p>Images are processed in the order they were submitted. Current queue length: <span id="queue-count">0</span>/400</p>
             <div class="queue-grid" id="queue-grid">
                 <!-- Queue items will be inserted here -->
             </div>
@@ -674,19 +737,27 @@
             // Clear current grid
             queueGrid.innerHTML = '';
             
+            // Create a grid with 400 squares (20x20)
+            const totalSquares = 400;
+            
             // Get queue items from Firestore
             db.collection('memecoins')
                 .orderBy('timestamp', 'desc')
-                .limit(100)
+                .limit(totalSquares)
                 .get()
                 .then((querySnapshot) => {
                     queueCount.textContent = querySnapshot.size;
+                    const filledPositions = new Set();
                     
+                    // Create filled squares
                     querySnapshot.forEach((doc, index) => {
                         const data = doc.data();
+                        const position = index;
+                        filledPositions.add(position);
                         
                         const queueItem = document.createElement('div');
-                        queueItem.className = 'queue-item';
+                        queueItem.className = 'queue-item filled';
+                        queueItem.setAttribute('data-position', position);
                         
                         const img = document.createElement('img');
                         img.src = data.imageUrl;
@@ -699,6 +770,22 @@
                         
                         queueGrid.appendChild(queueItem);
                     });
+                    
+                    // Fill the rest with empty squares
+                    for (let i = 0; i < totalSquares - querySnapshot.size; i++) {
+                        const position = querySnapshot.size + i;
+                        
+                        const emptyItem = document.createElement('div');
+                        emptyItem.className = 'queue-item empty';
+                        emptyItem.setAttribute('data-position', position);
+                        
+                        const positionEl = document.createElement('div');
+                        positionEl.className = 'queue-position';
+                        positionEl.textContent = position + 1;
+                        emptyItem.appendChild(positionEl);
+                        
+                        queueGrid.appendChild(emptyItem);
+                    }
                 })
                 .catch((error) => {
                     console.error('Error getting queue:', error);
