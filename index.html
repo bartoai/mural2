@@ -611,7 +611,8 @@
                     
                     // Reset form
                     selectedFile = null;
-                    document.getElementById('file-input').value = '';
+                    const fileInput = document.getElementById('file-input');
+                    if (fileInput) fileInput.value = '';
                     nameInput.value = '';
                     tickerInput.value = '';
                     document.getElementById('upload-area').innerHTML = '<p>Click here to upload an image</p>';
