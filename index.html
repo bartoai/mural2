@@ -915,57 +915,6 @@
                         queueItem.appendChild(caEl);
                         
                         queueGrid.appendChild(queueItem);
-                        
-                        // Also add a pixel to the desktop background
-                        const pixel = document.createElement('div');
-                        pixel.className = 'pixel filled';
-                        pixel.style.backgroundImage = `url(${data.imageUrl})`;
-                        pixel.setAttribute('data-name', data.name);
-                        pixel.setAttribute('data-ticker', data.ticker.toUpperCase());
-                        pixel.setAttribute('data-image', data.imageUrl);
-                        
-                        // Make pixel clickable instead of hover
-                        pixel.addEventListener('click', function(e) {
-                            // Prevent event bubbling
-                            e.stopPropagation();
-                            
-                            // Update tooltip content
-                            globalTooltip.innerHTML = '';
-                            
-                            const tooltipImg = document.createElement('img');
-                            tooltipImg.src = this.getAttribute('data-image');
-                            tooltipImg.onerror = function() {
-                                this.src = 'https://img.icons8.com/ios-filled/50/no-image.png';
-                            };
-                            globalTooltip.appendChild(tooltipImg);
-                            
-                            const tooltipName = document.createElement('div');
-                            tooltipName.className = 'pixel-tooltip-name';
-                            tooltipName.textContent = this.getAttribute('data-name');
-                            globalTooltip.appendChild(tooltipName);
-                            
-                            const tooltipTicker = document.createElement('div');
-                            tooltipTicker.className = 'pixel-tooltip-ticker';
-                            tooltipTicker.textContent = this.getAttribute('data-ticker');
-                            globalTooltip.appendChild(tooltipTicker);
-                            
-                            const tooltipCA = document.createElement('div');
-                            tooltipCA.className = 'pixel-tooltip-ca';
-                            tooltipCA.textContent = 'CA: QUEUED...';
-                            globalTooltip.appendChild(tooltipCA);
-                            
-                            // Position tooltip near click
-                            globalTooltip.style.display = 'block';
-                            
-                            // Position near click but ensure it stays on screen
-                            const x = Math.min(e.clientX, window.innerWidth - 320);
-                            const y = Math.min(e.clientY, window.innerHeight - 350);
-                            
-                            globalTooltip.style.left = x + 'px';
-                            globalTooltip.style.top = y + 'px';
-                        });
-                        
-                        desktopPixels.appendChild(pixel);
                     });
                     
                     // Fill the rest with empty items for the queue
@@ -1012,13 +961,83 @@
                         queueGrid.appendChild(emptyItem);
                     }
                     
-                    // Fill the remaining desktop pixels with empty squares
+                    // Create all empty pixels first
                     const totalPixels = 100 * 60; // 6000 pixels in a 100x60 grid
-                    for (let i = querySnapshot.size; i < totalPixels; i++) {
+                    for (let i = 0; i < totalPixels; i++) {
                         const pixel = document.createElement('div');
                         pixel.className = 'pixel';
+                        pixel.setAttribute('data-index', i);
                         desktopPixels.appendChild(pixel);
                     }
+                    
+                    // Now place filled pixels randomly
+                    const allPixels = document.querySelectorAll('.pixel');
+                    const usedPositions = new Set();
+                    const maxPosition = totalPixels - 1;
+                    
+                    // For each memecoin, assign a random position
+                    querySnapshot.forEach((doc, index) => {
+                        const data = doc.data();
+                        
+                        // Find an unused random position
+                        let randomPosition;
+                        do {
+                            randomPosition = Math.floor(Math.random() * maxPosition);
+                        } while (usedPositions.has(randomPosition));
+                        
+                        usedPositions.add(randomPosition);
+                        
+                        // Get the corresponding pixel element
+                        const pixelElement = allPixels[randomPosition];
+                        
+                        // Mark it as filled
+                        pixelElement.className = 'pixel filled';
+                        pixelElement.style.backgroundImage = `url(${data.imageUrl})`;
+                        pixelElement.setAttribute('data-name', data.name);
+                        pixelElement.setAttribute('data-ticker', data.ticker.toUpperCase());
+                        pixelElement.setAttribute('data-image', data.imageUrl);
+                        
+                        // Add click handler for tooltip
+                        pixelElement.addEventListener('click', function(e) {
+                            // Prevent event bubbling
+                            e.stopPropagation();
+                            
+                            // Update tooltip content
+                            globalTooltip.innerHTML = '';
+                            
+                            const tooltipImg = document.createElement('img');
+                            tooltipImg.src = this.getAttribute('data-image');
+                            tooltipImg.onerror = function() {
+                                this.src = 'https://img.icons8.com/ios-filled/50/no-image.png';
+                            };
+                            globalTooltip.appendChild(tooltipImg);
+                            
+                            const tooltipName = document.createElement('div');
+                            tooltipName.className = 'pixel-tooltip-name';
+                            tooltipName.textContent = this.getAttribute('data-name');
+                            globalTooltip.appendChild(tooltipName);
+                            
+                            const tooltipTicker = document.createElement('div');
+                            tooltipTicker.className = 'pixel-tooltip-ticker';
+                            tooltipTicker.textContent = this.getAttribute('data-ticker');
+                            globalTooltip.appendChild(tooltipTicker);
+                            
+                            const tooltipCA = document.createElement('div');
+                            tooltipCA.className = 'pixel-tooltip-ca';
+                            tooltipCA.textContent = 'CA: QUEUED...';
+                            globalTooltip.appendChild(tooltipCA);
+                            
+                            // Position tooltip near click
+                            globalTooltip.style.display = 'block';
+                            
+                            // Position near click but ensure it stays on screen
+                            const x = Math.min(e.clientX, window.innerWidth - 320);
+                            const y = Math.min(e.clientY, window.innerHeight - 350);
+                            
+                            globalTooltip.style.left = x + 'px';
+                            globalTooltip.style.top = y + 'px';
+                        });
+                    });
                 })
                 .catch((error) => {
                     console.error('Error getting queue:', error);
