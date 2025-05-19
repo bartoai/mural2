@@ -293,6 +293,14 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
             cursor: pointer;
             overflow: hidden;
+            transition: transform 0.1s ease;
+        }
+        
+        .pixel:hover {
+            transform: scale(1.5);
+            z-index: 10;
+            border: 1px solid rgba(0, 255, 0, 0.5);
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
         }
         
         .pixel.filled {
@@ -828,6 +836,20 @@
             queueGrid.innerHTML = '';
             desktopPixels.innerHTML = '';
             
+            // Create a single tooltip element that will be reused
+            let globalTooltip = document.getElementById('pixel-tooltip');
+            if (!globalTooltip) {
+                globalTooltip = document.createElement('div');
+                globalTooltip.className = 'pixel-tooltip';
+                globalTooltip.id = 'pixel-tooltip';
+                document.body.appendChild(globalTooltip);
+            }
+            
+            // Hide tooltip when clicking anywhere
+            document.addEventListener('click', function() {
+                globalTooltip.style.display = 'none';
+            });
+            
             // Total number of coins we want to display
             const totalCoins = 400;
             
@@ -887,56 +909,45 @@
                         pixel.setAttribute('data-ticker', data.ticker.toUpperCase());
                         pixel.setAttribute('data-image', data.imageUrl);
                         
-                        // Add tooltip for hover effect
-                        pixel.addEventListener('mousemove', function(e) {
-                            let tooltip = document.getElementById('pixel-tooltip');
-                            if (!tooltip) {
-                                tooltip = document.createElement('div');
-                                tooltip.className = 'pixel-tooltip';
-                                tooltip.id = 'pixel-tooltip';
-                                document.body.appendChild(tooltip);
-                            }
+                        // Make pixel clickable instead of hover
+                        pixel.addEventListener('click', function(e) {
+                            // Prevent event bubbling
+                            e.stopPropagation();
                             
-                            tooltip.innerHTML = '';
+                            // Update tooltip content
+                            globalTooltip.innerHTML = '';
                             
                             const tooltipImg = document.createElement('img');
                             tooltipImg.src = this.getAttribute('data-image');
                             tooltipImg.onerror = function() {
                                 this.src = 'https://img.icons8.com/ios-filled/50/no-image.png';
                             };
-                            tooltip.appendChild(tooltipImg);
+                            globalTooltip.appendChild(tooltipImg);
                             
                             const tooltipName = document.createElement('div');
                             tooltipName.className = 'pixel-tooltip-name';
                             tooltipName.textContent = this.getAttribute('data-name');
-                            tooltip.appendChild(tooltipName);
+                            globalTooltip.appendChild(tooltipName);
                             
                             const tooltipTicker = document.createElement('div');
                             tooltipTicker.className = 'pixel-tooltip-ticker';
                             tooltipTicker.textContent = this.getAttribute('data-ticker');
-                            tooltip.appendChild(tooltipTicker);
+                            globalTooltip.appendChild(tooltipTicker);
                             
                             const tooltipCA = document.createElement('div');
                             tooltipCA.className = 'pixel-tooltip-ca';
                             tooltipCA.textContent = 'CA: QUEUED...';
-                            tooltip.appendChild(tooltipCA);
+                            globalTooltip.appendChild(tooltipCA);
                             
-                            // Position tooltip near cursor
-                            tooltip.style.display = 'block';
+                            // Position tooltip near click
+                            globalTooltip.style.display = 'block';
                             
-                            // Position near mouse but ensure it stays on screen
+                            // Position near click but ensure it stays on screen
                             const x = Math.min(e.clientX, window.innerWidth - 320);
                             const y = Math.min(e.clientY, window.innerHeight - 350);
                             
-                            tooltip.style.left = x + 'px';
-                            tooltip.style.top = y + 'px';
-                        });
-                        
-                        pixel.addEventListener('mouseleave', function(e) {
-                            const tooltip = document.getElementById('pixel-tooltip');
-                            if (tooltip) {
-                                tooltip.style.display = 'none';
-                            }
+                            globalTooltip.style.left = x + 'px';
+                            globalTooltip.style.top = y + 'px';
                         });
                         
                         desktopPixels.appendChild(pixel);
