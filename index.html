@@ -440,6 +440,9 @@
     </div>
 
     <script>
+        // Keep track of the selected file globally
+        let selectedFile = null;
+        
         // Initialize Firebase with corrected storage bucket
         const firebaseConfig = {
             apiKey: "AIzaSyC7I64DSwjPUNGI7_M24VmvR0eAlC9LAe4",
@@ -545,6 +548,9 @@
             const file = event.target.files[0];
             if (!file) return;
             
+            // Store the file in the global variable
+            selectedFile = file;
+            
             console.log("File selected:", file.name, file.type, file.size);
             
             // Display the selected image in the upload area
@@ -564,14 +570,15 @@
         
         // Tokenization process
         function startTokenization() {
-            const fileInput = document.getElementById('file-input');
-            const nameInput = document.getElementById('memecoin-name');
-            const tickerInput = document.getElementById('memecoin-ticker');
+            console.log("Starting tokenization function");
             
-            if (!fileInput.files[0]) {
+            if (!selectedFile) {
                 alert('Please select an image first.');
                 return;
             }
+            
+            const nameInput = document.getElementById('memecoin-name');
+            const tickerInput = document.getElementById('memecoin-ticker');
             
             if (!nameInput.value) {
                 alert('Please enter a name for your memecoin.');
@@ -594,7 +601,7 @@
                 .then(() => {
                     // Upload to Firebase
                     console.log("Processing complete, uploading to Firebase");
-                    return uploadToFirebase(fileInput.files[0], nameInput.value, tickerInput.value);
+                    return uploadToFirebase(selectedFile, nameInput.value, tickerInput.value);
                 })
                 .then(() => {
                     console.log("Upload successful");
@@ -603,7 +610,8 @@
                     document.getElementById('success-dialog').style.display = 'block';
                     
                     // Reset form
-                    fileInput.value = '';
+                    selectedFile = null;
+                    document.getElementById('file-input').value = '';
                     nameInput.value = '';
                     tickerInput.value = '';
                     document.getElementById('upload-area').innerHTML = '<p>Click here to upload an image</p>';
