@@ -209,43 +209,138 @@
             margin-top: 20px;
         }
         
-        /* Memecoin Queue Window */
+        /* Memecoin Queue Window - Pump.fun style */
         .queue-grid {
-            display: grid;
-            grid-template-columns: repeat(20, 1fr);
-            gap: 2px;
-            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
             width: 100%;
+            margin-top: 20px;
+            gap: 5px;
+            font-family: "MS Sans Serif", sans-serif;
         }
         
         .queue-item {
             position: relative;
             width: 100%;
-            padding-bottom: 100%; /* Square aspect ratio */
-            background-color: #c0c0c0;
+            display: flex;
+            align-items: center;
+            padding: 8px;
             border: 1px solid #0a0a0a;
+            background-color: #000;
+            color: #fff;
+            cursor: pointer;
         }
         
-        .queue-item.filled img {
+        .queue-item.filled:hover {
+            background-color: #111;
+        }
+        
+        .queue-item.empty {
+            background-color: #222;
+            color: #666;
+            border: 1px dotted #444;
+        }
+        
+        .queue-item-image {
+            width: 32px;
+            height: 32px;
+            margin-right: 12px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .queue-item-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        .queue-item-name {
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .queue-item-ticker {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .queue-item-time {
+            font-size: 11px;
+            color: #0f0;
+            margin-right: 8px;
+        }
+        
+        /* Desktop background pixels */
+        .desktop-pixels {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            display: grid;
+            grid-template-columns: repeat(40, 1fr);
+            grid-template-rows: repeat(30, 1fr);
+            z-index: 1;
         }
         
-        .queue-item.empty {
-            background-color: #e0e0e0;
-            border: 1px dotted #666;
+        .pixel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            overflow: hidden;
         }
         
-        .queue-item .queue-position {
+        .pixel.filled {
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .pixel-tooltip {
+            display: none;
             position: absolute;
-            top: 3px;
-            left: 3px;
-            font-size: 8px;
-            color: #444;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0f0;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            z-index: 1000;
+            color: #fff;
+            text-align: center;
+        }
+        
+        .pixel-tooltip img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin: 0 auto 10px;
+            border: 1px solid #0f0;
+            display: block;
+        }
+        
+        .pixel-tooltip-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .pixel-tooltip-ticker {
+            font-size: 14px;
+            color: #0f0;
+            margin-bottom: 10px;
+        }
+        
+        .pixel-tooltip-ca {
+            font-size: 12px;
+            color: #999;
+            word-break: break-all;
         }
         
         .queue-number {
@@ -337,6 +432,11 @@
 </head>
 <body>
     <div class="desktop" id="desktop">
+        <!-- Desktop Pixels (Background) -->
+        <div class="desktop-pixels" id="desktop-pixels">
+            <!-- Pixels will be inserted here dynamically -->
+        </div>
+        
         <!-- Desktop Icon -->
         <div class="desktop-icon" onclick="openWindow('tokenmaker')">
             <img src="https://img.icons8.com/fluency/96/floppy-disk.png" alt="TokenMaker 98">
@@ -722,68 +822,174 @@
             
             const queueGrid = document.getElementById('queue-grid');
             const queueCount = document.getElementById('queue-count');
+            const desktopPixels = document.getElementById('desktop-pixels');
             
-            // Clear current grid
+            // Clear current grid and pixels
             queueGrid.innerHTML = '';
+            desktopPixels.innerHTML = '';
             
-            // Create a grid with 400 squares (20x20)
-            const totalSquares = 400;
+            // Total number of coins we want to display
+            const totalCoins = 400;
             
             // Get queue items from Firestore
             db.collection('memecoins')
                 .orderBy('timestamp', 'desc')
-                .limit(totalSquares)
+                .limit(totalCoins)
                 .get()
                 .then((querySnapshot) => {
                     console.log(`Found ${querySnapshot.size} items in queue`);
                     queueCount.textContent = querySnapshot.size;
-                    const filledPositions = new Set();
                     
-                    // Create filled squares
+                    // Create filled items for the queue window
                     querySnapshot.forEach((doc, index) => {
                         const data = doc.data();
-                        const position = index;
-                        filledPositions.add(position);
                         
+                        // Create pump.fun style list item
                         const queueItem = document.createElement('div');
                         queueItem.className = 'queue-item filled';
-                        queueItem.setAttribute('data-position', position);
+                        queueItem.setAttribute('data-position', index);
+                        
+                        const timeEl = document.createElement('div');
+                        timeEl.className = 'queue-item-time';
+                        const timeAgo = getTimeAgo(data.timestamp);
+                        timeEl.textContent = timeAgo;
+                        queueItem.appendChild(timeEl);
                         
                         const img = document.createElement('img');
+                        img.className = 'queue-item-image';
                         img.src = data.imageUrl;
                         img.onerror = function() {
-                            console.error(`Failed to load image: ${data.imageUrl}`);
                             this.src = 'https://img.icons8.com/ios-filled/50/no-image.png';
                         };
                         queueItem.appendChild(img);
                         
-                        const number = document.createElement('div');
-                        number.className = 'queue-number';
-                        number.textContent = index + 1;
-                        queueItem.appendChild(number);
+                        const infoDiv = document.createElement('div');
+                        infoDiv.className = 'queue-item-info';
                         
+                        const nameEl = document.createElement('div');
+                        nameEl.className = 'queue-item-name';
+                        nameEl.textContent = data.name;
+                        infoDiv.appendChild(nameEl);
+                        
+                        const tickerEl = document.createElement('div');
+                        tickerEl.className = 'queue-item-ticker';
+                        tickerEl.textContent = data.ticker.toUpperCase();
+                        infoDiv.appendChild(tickerEl);
+                        
+                        queueItem.appendChild(infoDiv);
                         queueGrid.appendChild(queueItem);
+                        
+                        // Also add a pixel to the desktop background
+                        const pixel = document.createElement('div');
+                        pixel.className = 'pixel filled';
+                        pixel.style.backgroundImage = `url(${data.imageUrl})`;
+                        pixel.setAttribute('data-name', data.name);
+                        pixel.setAttribute('data-ticker', data.ticker.toUpperCase());
+                        pixel.setAttribute('data-image', data.imageUrl);
+                        
+                        // Add tooltip for hover effect
+                        pixel.addEventListener('mouseenter', function(e) {
+                            const tooltip = document.createElement('div');
+                            tooltip.className = 'pixel-tooltip';
+                            
+                            const tooltipImg = document.createElement('img');
+                            tooltipImg.src = this.getAttribute('data-image');
+                            tooltip.appendChild(tooltipImg);
+                            
+                            const tooltipName = document.createElement('div');
+                            tooltipName.className = 'pixel-tooltip-name';
+                            tooltipName.textContent = this.getAttribute('data-name');
+                            tooltip.appendChild(tooltipName);
+                            
+                            const tooltipTicker = document.createElement('div');
+                            tooltipTicker.className = 'pixel-tooltip-ticker';
+                            tooltipTicker.textContent = this.getAttribute('data-ticker');
+                            tooltip.appendChild(tooltipTicker);
+                            
+                            const tooltipCA = document.createElement('div');
+                            tooltipCA.className = 'pixel-tooltip-ca';
+                            tooltipCA.textContent = 'CA: PROCESSING...';
+                            tooltip.appendChild(tooltipCA);
+                            
+                            this.appendChild(tooltip);
+                            tooltip.style.display = 'block';
+                        });
+                        
+                        pixel.addEventListener('mouseleave', function(e) {
+                            const tooltip = this.querySelector('.pixel-tooltip');
+                            if (tooltip) {
+                                tooltip.remove();
+                            }
+                        });
+                        
+                        desktopPixels.appendChild(pixel);
                     });
                     
-                    // Fill the rest with empty squares
-                    for (let i = 0; i < totalSquares - querySnapshot.size; i++) {
+                    // Fill the rest with empty items for the queue
+                    for (let i = 0; i < totalCoins - querySnapshot.size; i++) {
                         const position = querySnapshot.size + i;
                         
+                        // Empty queue item
                         const emptyItem = document.createElement('div');
                         emptyItem.className = 'queue-item empty';
                         emptyItem.setAttribute('data-position', position);
                         
-                        const positionEl = document.createElement('div');
-                        positionEl.className = 'queue-position';
-                        positionEl.textContent = position + 1;
-                        emptyItem.appendChild(positionEl);
+                        const timeEl = document.createElement('div');
+                        timeEl.className = 'queue-item-time';
+                        timeEl.textContent = '...';
+                        emptyItem.appendChild(timeEl);
                         
+                        const placeholderImg = document.createElement('div');
+                        placeholderImg.className = 'queue-item-image';
+                        placeholderImg.style.backgroundColor = '#333';
+                        emptyItem.appendChild(placeholderImg);
+                        
+                        const infoDiv = document.createElement('div');
+                        infoDiv.className = 'queue-item-info';
+                        
+                        const nameEl = document.createElement('div');
+                        nameEl.className = 'queue-item-name';
+                        nameEl.textContent = 'Waiting for submission...';
+                        infoDiv.appendChild(nameEl);
+                        
+                        const tickerEl = document.createElement('div');
+                        tickerEl.className = 'queue-item-ticker';
+                        tickerEl.textContent = '???';
+                        infoDiv.appendChild(tickerEl);
+                        
+                        emptyItem.appendChild(infoDiv);
                         queueGrid.appendChild(emptyItem);
+                    }
+                    
+                    // Fill the remaining desktop pixels with empty squares
+                    const totalPixels = 40 * 30; // 1200 pixels in a 40x30 grid
+                    for (let i = querySnapshot.size; i < totalPixels; i++) {
+                        const pixel = document.createElement('div');
+                        pixel.className = 'pixel';
+                        desktopPixels.appendChild(pixel);
                     }
                 })
                 .catch((error) => {
                     console.error('Error getting queue:', error);
                 });
+        }
+        
+        // Helper function to format time ago
+        function getTimeAgo(timestamp) {
+            const now = new Date().getTime();
+            const diff = now - timestamp;
+            
+            const seconds = Math.floor(diff / 1000);
+            if (seconds < 60) return `${seconds}s`;
+            
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m`;
+            
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h`;
+            
+            const days = Math.floor(hours / 24);
+            return `${days}d`;
         }
         
         // Dialogs
