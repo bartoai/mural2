@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TokenMaker 98</title>
+    <link rel="icon" href="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/682a75c1476869d768953be8_May%2019%2C%202025%2C%2012_45_27%20AM.png" type="image/png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/98.css/0.1.20/98.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-storage-compat.min.js"></script>
@@ -266,6 +267,13 @@
             color: #999;
         }
         
+        .queue-item-ca {
+            font-size: 11px;
+            color: #0f0;
+            margin-left: auto;
+            padding-right: 10px;
+        }
+        
         .queue-item-time {
             font-size: 11px;
             color: #0f0;
@@ -512,7 +520,7 @@
             </div>
         </div>
         <div class="window-nav">
-            <button class="window-nav-button">View</button>
+            <button class="window-nav-button" onclick="window.open('https://www.pump.fun/board', '_blank')">pump.fun</button>
             <button class="window-nav-button" onclick="loadQueueFromFirebase()">Refresh</button>
         </div>
         <div class="window-content">
@@ -899,6 +907,13 @@
                         infoDiv.appendChild(tickerEl);
                         
                         queueItem.appendChild(infoDiv);
+                        
+                        // Add CA: PENDING... text
+                        const caEl = document.createElement('div');
+                        caEl.className = 'queue-item-ca';
+                        caEl.textContent = 'CA: PENDING...';
+                        queueItem.appendChild(caEl);
+                        
                         queueGrid.appendChild(queueItem);
                         
                         // Also add a pixel to the desktop background
@@ -986,6 +1001,14 @@
                         infoDiv.appendChild(tickerEl);
                         
                         emptyItem.appendChild(infoDiv);
+                        
+                        // Add CA: PENDING... text for empty items too
+                        const caEl = document.createElement('div');
+                        caEl.className = 'queue-item-ca';
+                        caEl.textContent = 'CA: PENDING...';
+                        caEl.style.color = '#444'; // Dimmer for empty items
+                        emptyItem.appendChild(caEl);
+                        
                         queueGrid.appendChild(emptyItem);
                     }
                     
