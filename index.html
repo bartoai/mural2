@@ -687,47 +687,62 @@
             const progressText = document.getElementById('progress-text');
             const uploadButton = document.getElementById('upload-button');
             
-            // Show progress
-            progressContainer.style.display = 'block';
-            uploadButton.disabled = true;
-            uploadButton.textContent = 'Uploading...';
-            
-            const timestamp = new Date().getTime();
-            const filename = `${timestamp}_${selectedFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-            const storageRef = storage.ref(`pixels/${filename}`);
-            
-            // Upload file
-            const uploadTask = storageRef.put(selectedFile);
-            
-            uploadTask.on('state_changed', 
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    progressFill.style.width = progress + '%';
-                    progressText.textContent = `Uploading... ${Math.round(progress)}%`;
-                },
-                (error) => {
-                    console.error('Upload error:', error);
-                    alert('Upload failed: ' + error.message);
-                    resetUploadForm();
-                },
-                () => {
-                    // Get download URL and save to Firestore
-                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                        // Find an empty pixel
-                        findEmptyPixel().then(pixelIndex => {
-                            // Save to Firestore
-                            db.collection('pixels').add({
-                                imageUrl: downloadURL,
-                                uploaderName: uploaderName,
-                                timestamp: timestamp,
-                                pixelIndex: pixelIndex
+            try {
+                // Show progress
+                if (progressContainer) progressContainer.style.display = 'block';
+                if (uploadButton) {
+                    uploadButton.disabled = true;
+                    uploadButton.textContent = 'Uploading...';
+                }
+                
+                const timestamp = new Date().getTime();
+                const filename = `${timestamp}_${selectedFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                const storageRef = storage.ref(`pixels/${filename}`);
+                
+                console.log('Starting upload to:', storageRef.fullPath);
+                
+                // Upload file
+                const uploadTask = storageRef.put(selectedFile);
+                
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log('Upload progress:', progress);
+                        if (progressFill) progressFill.style.width = progress + '%';
+                        if (progressText) progressText.textContent = `Uploading... ${Math.round(progress)}%`;
+                    },
+                    (error) => {
+                        console.error('Upload error:', error);
+                        alert('Upload failed: ' + error.message);
+                        resetUploadForm();
+                    },
+                    () => {
+                        console.log('Upload completed successfully');
+                        // Get download URL and save to Firestore
+                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                            console.log('Got download URL:', downloadURL);
+                            
+                            // Find an empty pixel
+                            findEmptyPixel().then(pixelIndex => {
+                                console.log('Found empty pixel at index:', pixelIndex);
+                                
+                                // Save to Firestore
+                                return db.collection('pixels').add({
+                                    imageUrl: downloadURL,
+                                    uploaderName: uploaderName,
+                                    timestamp: timestamp,
+                                    pixelIndex: pixelIndex
+                                });
                             })
                             .then(() => {
-                                progressText.textContent = 'Success!';
+                                console.log('Successfully saved to Firestore');
+                                if (progressText) progressText.textContent = 'Success!';
                                 
                                 // Show success dialog
-                                document.getElementById('pixel-number').textContent = pixelIndex;
-                                document.getElementById('success-dialog').style.display = 'block';
+                                const pixelNumberSpan = document.getElementById('pixel-number');
+                                const successDialog = document.getElementById('success-dialog');
+                                if (pixelNumberSpan) pixelNumberSpan.textContent = 'assigned';
+                                if (successDialog) successDialog.style.display = 'block';
                                 
                                 // Reset form
                                 resetUploadForm();
@@ -740,24 +755,45 @@
                                 alert('Failed to save: ' + error.message);
                                 resetUploadForm();
                             });
+                        })
+                        .catch((error) => {
+                            console.error('Error getting download URL:', error);
+                            alert('Failed to get download URL: ' + error.message);
+                            resetUploadForm();
                         });
-                    });
-                }
-            );
+                    }
+                );
+            } catch (error) {
+                console.error('Upload function error:', error);
+                alert('Upload failed: ' + error.message);
+                resetUploadForm();
+            }
         }
         
         function resetUploadForm() {
             selectedFile = null;
-            document.getElementById('file-input').value = '';
-            document.getElementById('uploader-name').value = '';
-            document.getElementById('upload-area').innerHTML = `
-                <p>📁 Click here to upload an image</p>
-                <p style="font-size: 12px; color: #666;">Or drag and drop an image here</p>
-            `;
-            document.getElementById('progress-container').style.display = 'none';
-            document.getElementById('progress-fill').style.width = '0%';
-            document.getElementById('upload-button').disabled = true;
-            document.getElementById('upload-button').textContent = 'Select an image first';
+            
+            const fileInput = document.getElementById('file-input');
+            const uploaderName = document.getElementById('uploader-name');
+            const uploadArea = document.getElementById('upload-area');
+            const progressContainer = document.getElementById('progress-container');
+            const progressFill = document.getElementById('progress-fill');
+            const uploadButton = document.getElementById('upload-button');
+            
+            if (fileInput) fileInput.value = '';
+            if (uploaderName) uploaderName.value = '';
+            if (uploadArea) {
+                uploadArea.innerHTML = `
+                    <p>📁 Click here to upload an image</p>
+                    <p style="font-size: 12px; color: #666;">Or drag and drop an image here</p>
+                `;
+            }
+            if (progressContainer) progressContainer.style.display = 'none';
+            if (progressFill) progressFill.style.width = '0%';
+            if (uploadButton) {
+                uploadButton.disabled = true;
+                uploadButton.textContent = 'Select an image first';
+            }
         }
         
         // Find an empty pixel randomly
