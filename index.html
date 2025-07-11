@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memeable Deploy - Tokenize Pics & GIFs instantly</title>
+    <title>Memeable Deploy - Fill the Pixel Grid!</title>
     <link rel="icon" href="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/6830ea826dac4b4454a3f659_67125ee2dd5377dcd914df1d1e3cf94f.png" type="image/png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/98.css/0.1.20/98.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
@@ -29,15 +29,15 @@
         }
 
         .taskbar-status {
-    margin-left: 10px;
-    font-size: 12px;
-    color: #000;
-    font-family: "MS Sans Serif", sans-serif;
-    padding: 2px 8px;
-    background-color: silver;
-    border: 1px solid #0a0a0a;
-    box-shadow: inset 1px 1px #fff, inset -1px -1px #0a0a0a;
-}
+            margin-left: 10px;
+            font-size: 12px;
+            color: #000;
+            font-family: "MS Sans Serif", sans-serif;
+            padding: 2px 8px;
+            background-color: silver;
+            border: 1px solid #0a0a0a;
+            box-shadow: inset 1px 1px #fff, inset -1px -1px #0a0a0a;
+        }
         
         .taskbar {
             position: fixed;
@@ -107,34 +107,13 @@
             margin-right: 10px;
         }
         
-        .desktop-icon {
-            width: 70px;
-            text-align: center;
-            margin: 15px;
-            float: left;
-            cursor: pointer;
-        }
-        
-        .desktop-icon img {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 5px;
-        }
-        
-        .desktop-icon p {
-            margin: 0;
-            color: white;
-            text-shadow: 1px 1px 1px #000;
-            font-size: 12px;
-        }
-        
         .window {
             position: absolute;
             background-color: silver;
             border: 1px solid #000;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-            min-width: 300px;
-            min-height: 200px;
+            min-width: 400px;
+            min-height: 300px;
             display: none;
             resize: both;
             overflow: auto;
@@ -183,7 +162,7 @@
         }
         
         .window-content {
-            padding: 10px;
+            padding: 20px;
             height: calc(100% - 55px);
             overflow: auto;
         }
@@ -208,87 +187,55 @@
             box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff;
         }
         
-        /* TokenMaker Window */
+        /* Upload Window */
         .upload-area {
             border: 2px dashed #0a0a0a;
-            padding: 20px;
+            padding: 40px;
             text-align: center;
             margin-bottom: 20px;
             cursor: pointer;
-        }
-        
-        .upload-progress {
-            display: none;
-            margin-top: 20px;
-        }
-        
-        /* Memecoin Queue Window - Pump.fun style */
-        .queue-grid {
+            min-height: 200px;
             display: flex;
             flex-direction: column;
-            width: 100%;
-            margin-top: 20px;
-            gap: 5px;
-            font-family: "MS Sans Serif", sans-serif;
-        }
-        
-        .queue-item {
-            position: relative;
-            width: 100%;
-            display: flex;
+            justify-content: center;
             align-items: center;
-            padding: 8px;
+        }
+        
+        .upload-area.dragover {
+            background-color: #f0f0f0;
+            border-color: #000080;
+        }
+        
+        .upload-preview {
+            max-width: 200px;
+            max-height: 150px;
+            margin-bottom: 10px;
+        }
+        
+        /* Stats Window */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
             border: 1px solid #0a0a0a;
-            background-color: #000;
-            color: #fff;
-            cursor: pointer;
+            padding: 15px;
+            text-align: center;
+            background-color: #f0f0f0;
         }
         
-        .queue-item.filled:hover {
-            background-color: #111;
-        }
-        
-        .queue-item.empty {
-            background-color: #222;
-            color: #666;
-            border: 1px dotted #444;
-        }
-        
-        .queue-item-image {
-            width: 32px;
-            height: 32px;
-            margin-right: 12px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        
-        .queue-item-info {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-        
-        .queue-item-name {
+        .stat-number {
+            font-size: 24px;
             font-weight: bold;
-            color: #fff;
+            color: #000080;
         }
         
-        .queue-item-ticker {
+        .stat-label {
             font-size: 12px;
-            color: #999;
-        }
-        
-        .queue-item-ca {
-            font-size: 11px;
-            color: #0f0;
-            margin-left: auto;
-            padding-right: 10px;
-        }
-        
-        .queue-item-time {
-            font-size: 11px;
-            color: #0f0;
-            margin-right: 8px;
+            margin-top: 5px;
         }
         
         /* Desktop background pixels */
@@ -308,7 +255,7 @@
         .pixel {
             position: relative;
             aspect-ratio: 1/1;
-            background-color: #fff;
+            background-color: #333;
             border: 1px solid rgba(0, 0, 0, 0.1);
             cursor: pointer;
             overflow: hidden;
@@ -325,15 +272,12 @@
         .pixel.filled {
             background-size: cover;
             background-position: center;
+            background-color: #fff;
         }
         
         .pixel-tooltip {
             display: none;
-            position: fixed; /* Changed to fixed for better positioning */
-            top: 50%;
-            left: 50%;
-            transform: translate(-100px, -150px); /* Offset to position near cursor */
-            width: 300px;
+            position: fixed;
             background-color: rgba(0, 0, 0, 0.9);
             border: 2px solid #0f0;
             padding: 20px;
@@ -342,6 +286,7 @@
             color: #fff;
             text-align: center;
             border-radius: 5px;
+            max-width: 300px;
         }
         
         .pixel-tooltip img {
@@ -356,71 +301,45 @@
         
         .pixel-tooltip-name {
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             color: #fff;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
         
-        .pixel-tooltip-ticker {
-            font-size: 16px;
-            color: #0f0;
-            margin-bottom: 15px;
-        }
-        
-        .pixel-tooltip-ca {
-            font-size: 14px;
-            color: #999;
-            word-break: break-all;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            border-radius: 3px;
-        }
-        
-        .queue-number {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            font-size: 10px;
-            padding: 2px;
-            z-index: 1;
-        }
-
-        .processing-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .processing-dialog {
-            width: 300px;
-            background-color: silver;
-            border: 1px solid #000;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-            padding: 15px;
-        }
-
-        .processing-dialog h2 {
-            margin-top: 0;
-            font-size: 16px;
-        }
-
-        .processing-progress {
-            width: 100%;
-            margin: 15px 0;
-        }
-
-        .processing-status {
+        .pixel-tooltip-uploader {
             font-size: 12px;
-            margin-bottom: 15px;
+            color: #0f0;
+            margin-bottom: 10px;
+        }
+        
+        .pixel-tooltip-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #0a0a0a;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #000080;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            text-align: center;
         }
         
         /* Dialog */
@@ -434,8 +353,8 @@
             border: 1px solid #000;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
             z-index: 2000;
-            padding: 15px;
-            min-width: 250px;
+            padding: 20px;
+            min-width: 300px;
         }
         
         .dialog.active {
@@ -445,10 +364,12 @@
         .dialog-title {
             font-weight: bold;
             margin-bottom: 15px;
+            font-size: 16px;
         }
         
         .dialog-content {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            line-height: 1.4;
         }
         
         .dialog-buttons {
@@ -458,7 +379,7 @@
         
         .dialog-button {
             margin: 0 5px;
-            padding: 5px 15px;
+            padding: 8px 20px;
             cursor: pointer;
         }
     </style>
@@ -477,38 +398,38 @@
             <img src="https://img.icons8.com/color/96/windows-95.png" alt="Start">
             <span>Start</span>
         </div>
-        <div class="taskbar-status">CA:H9RhwAkCh5KCjHQT8PinCigC1ASVd23wZBNyttSEpump</div>
+        <div class="taskbar-status" id="taskbar-status">Pixels filled: 0/6000</div>
         <div id="taskbar-items"></div>
     </div>
     
     <!-- Start Menu -->
     <div class="start-menu" id="start-menu">
-    <div class="start-menu-item" onclick="openWindow('tokenmaker'); toggleStartMenu();">
-        <img src="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/682a75c1476869d768953be8_May%2019%2C%202025%2C%2012_45_27%20AM.png" alt="TokenMaker">
-        <span>TokenMaker 98</span>
+        <div class="start-menu-item" onclick="openWindow('upload'); toggleStartMenu();">
+            <img src="https://img.icons8.com/ios-filled/50/upload.png" alt="Upload">
+            <span>Upload Image</span>
+        </div>
+        <div class="start-menu-item" onclick="openWindow('stats'); toggleStartMenu();">
+            <img src="https://img.icons8.com/ios-filled/50/bar-chart.png" alt="Stats">
+            <span>Grid Stats</span>
+        </div>
+        <div class="start-menu-item" onclick="window.open('https://twitter.com/memeabledeploy', '_blank'); toggleStartMenu();">
+            <img src="https://img.icons8.com/color/48/twitter--v1.png" alt="Twitter">
+            <span>Twitter</span>
+        </div>
+        <div class="start-menu-item" onclick="window.open('https://pump.fun/coin/H9RhwAkCh5KCjHQT8PinCigC1ASVd23wZBNyttSEpump', '_blank'); toggleStartMenu();">
+            <img src="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/67e09302ce2c79cb6daaebcc_Pump_fun_logo%20(2).png" alt="pump.fun">
+            <span>pump.fun</span>
+        </div>
     </div>
-    <div class="start-menu-item" onclick="openWindow('queue'); toggleStartMenu();">
-        <img src="https://img.icons8.com/ios-filled/50/queue.png" alt="Queue">
-        <span>Memecoin Queue</span>
-    </div>
-    <div class="start-menu-item" onclick="window.open('https://twitter.com/memeabledeploy', '_blank'); toggleStartMenu();">
-        <img src="https://img.icons8.com/color/48/twitter--v1.png" alt="Twitter">
-        <span>Twitter</span>
-    </div>
-    <div class="start-menu-item" onclick="window.open('https://pump.fun/coin/H9RhwAkCh5KCjHQT8PinCigC1ASVd23wZBNyttSEpump', '_blank'); toggleStartMenu();">
-        <img src="https://cdn.prod.website-files.com/6740d85c4e3daeef29a89470/67e09302ce2c79cb6daaebcc_Pump_fun_logo%20(2).png" alt="pump.fun">
-        <span>pump.fun</span>
-    </div>
-</div>
     
-    <!-- TokenMaker Window -->
-    <div class="window" id="tokenmaker-window">
+    <!-- Upload Window -->
+    <div class="window" id="upload-window">
         <div class="window-header">
-            <div class="window-title">TokenMaker 98</div>
+            <div class="window-title">Upload Image to Grid</div>
             <div class="window-controls">
-                <div class="window-control" onclick="minimizeWindow('tokenmaker')">_</div>
-                <div class="window-control" onclick="maximizeWindow('tokenmaker')">□</div>
-                <div class="window-control" onclick="closeWindow('tokenmaker')">×</div>
+                <div class="window-control" onclick="minimizeWindow('upload')">_</div>
+                <div class="window-control" onclick="maximizeWindow('upload')">□</div>
+                <div class="window-control" onclick="closeWindow('upload')">×</div>
             </div>
         </div>
         <div class="window-nav">
@@ -517,90 +438,105 @@
             <button class="window-nav-button">Help</button>
         </div>
         <div class="window-content">
-            <h2>Create Your Memecoin</h2>
-            <p>Upload an image to tokenize it as a memecoin on the Solana blockchain.</p>
+            <h2>Fill a Pixel!</h2>
+            <p>Upload an image to claim a random pixel on the grid. Help fill the entire page!</p>
             <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
-                <p>Click here to upload an image</p>
+                <p>📁 Click here to upload an image</p>
+                <p style="font-size: 12px; color: #666;">Or drag and drop an image here</p>
                 <input type="file" id="file-input" style="display: none" accept="image/*" onchange="handleFileUpload(event)">
             </div>
             <div class="upload-info">
-                <p><strong>Name your memecoin:</strong></p>
-                <input type="text" class="window-input" id="memecoin-name" placeholder="Enter a name">
-                <p><strong>Ticker symbol:</strong></p>
-                <input type="text" class="window-input" id="memecoin-ticker" placeholder="Enter ticker (e.g. BTC)" maxlength="5">
+                <p><strong>Your name (optional):</strong></p>
+                <input type="text" class="window-input" id="uploader-name" placeholder="Enter your name" style="width: 100%; padding: 5px;">
             </div>
-            <button class="window-nav-button" onclick="startTokenization()" style="margin-top: 15px;">Create Memecoin</button>
+            <div class="progress-container" id="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">Uploading...</div>
+            </div>
+            <button class="window-nav-button" onclick="uploadImage()" id="upload-button" style="margin-top: 15px;" disabled>Select an image first</button>
         </div>
     </div>
     
-    <!-- Memecoin Queue Window -->
-    <div class="window" id="queue-window">
+    <!-- Stats Window -->
+    <div class="window" id="stats-window">
         <div class="window-header">
-            <div class="window-title">Memecoin Queue</div>
+            <div class="window-title">Grid Statistics</div>
             <div class="window-controls">
-                <div class="window-control" onclick="minimizeWindow('queue')">_</div>
-                <div class="window-control" onclick="maximizeWindow('queue')">□</div>
-                <div class="window-control" onclick="closeWindow('queue')">×</div>
+                <div class="window-control" onclick="minimizeWindow('stats')">_</div>
+                <div class="window-control" onclick="maximizeWindow('stats')">□</div>
+                <div class="window-control" onclick="closeWindow('stats')">×</div>
             </div>
         </div>
         <div class="window-nav">
-            <button class="window-nav-button" onclick="window.open('https://pump.fun/coin/H9RhwAkCh5KCjHQT8PinCigC1ASVd23wZBNyttSEpump', '_blank')">pump.fun</button>
-            <button class="window-nav-button" onclick="loadQueueFromFirebase()">Refresh</button>
+            <button class="window-nav-button" onclick="loadStatsFromFirebase()">Refresh</button>
+            <button class="window-nav-button">Export</button>
         </div>
         <div class="window-content">
-            <h2>Current Memecoin Queue</h2>
-            <p>Images are processed in the order they were submitted. Current queue length: <span id="queue-count">0</span>/400</p>
-            <div class="queue-grid" id="queue-grid">
-                <!-- Queue items will be inserted here -->
+            <h2>Pixel Grid Progress</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number" id="filled-count">0</div>
+                    <div class="stat-label">Pixels Filled</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="completion-percent">0%</div>
+                    <div class="stat-label">Completion</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="total-uploaders">0</div>
+                    <div class="stat-label">Contributors</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="recent-uploads">0</div>
+                    <div class="stat-label">Last 24h</div>
+                </div>
+            </div>
+            <p><strong>Goal:</strong> Fill all 6,000 pixels with images from the community!</p>
+            <p><strong>Recent activity:</strong></p>
+            <div id="recent-activity" style="font-size: 12px; max-height: 200px; overflow-y: auto;">
+                Loading...
             </div>
         </div>
     </div>
 
-    <!-- Processing Overlay -->
-    <div class="processing-overlay" id="processing-overlay">
-        <div class="processing-dialog">
-            <h2>Processing Your Memecoin</h2>
-            <div class="processing-status" id="processing-status">Initializing blockchain connection...</div>
-            <progress class="processing-progress" id="processing-progress" value="0" max="100"></progress>
-            <div style="text-align: center;">
-                <button class="window-nav-button" onclick="document.getElementById('processing-overlay').style.display = 'none';" id="processing-done-button" disabled>Please wait...</button>
-            </div>
-        </div>
-    </div>
-    
     <!-- Success Dialog -->
     <div class="dialog" id="success-dialog">
-        <div class="dialog-title">Success!</div>
+        <div class="dialog-title">Success! 🎉</div>
         <div class="dialog-content">
-            Your image has been successfully queued for tokenization. It will be minted as a memecoin shortly.
+            Your image has been added to the pixel grid! You claimed pixel #<span id="pixel-number"></span>. 
+            <br><br>
+            Help us fill the entire grid by sharing with friends!
         </div>
         <div class="dialog-buttons">
-            <button class="window-nav-button dialog-button" onclick="hideDialog('success-dialog')">OK</button>
+            <button class="window-nav-button dialog-button" onclick="hideDialog('success-dialog')">Awesome!</button>
         </div>
+    </div>
+
+    <!-- Pixel Tooltip -->
+    <div class="pixel-tooltip" id="pixel-tooltip">
+        <!-- Tooltip content will be populated dynamically -->
     </div>
 
     <script>
         // Keep track of the selected file globally
         let selectedFile = null;
         
-        // Initialize Firebase with corrected storage bucket
+        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC7I64DSwjPUNGI7_M24VmvR0eAlC9LAe4",
             authDomain: "windows98-memecoin-generator.firebaseapp.com",
             projectId: "windows98-memecoin-generator",
-            storageBucket: "windows98-memecoin-generator.firebasestorage.app", // Correct bucket name
+            storageBucket: "windows98-memecoin-generator.firebasestorage.app",
             messagingSenderId: "728845451357",
             appId: "1:728845451357:web:63f3be889a4f90c74d0db4",
             measurementId: "G-WH3FTWGVL1"
         };
         
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const storage = firebase.storage();
         const db = firebase.firestore();
-        
-        // Add console logs to help debug
-        console.log("Firebase initialized");
         
         // Window management
         let activeWindows = {};
@@ -611,7 +547,6 @@
             windowElement.style.display = 'block';
             windowElement.style.zIndex = ++zIndex;
             
-            // Set default position if not already set
             if (!windowElement.style.top) {
                 windowElement.style.top = '50px';
                 windowElement.style.left = '50px';
@@ -683,15 +618,42 @@
             }
         });
         
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('upload-area');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
         // File upload handling
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            handleFile(file);
+        }
+        
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file.');
+                return;
+            }
             
-            // Store the file in the global variable
             selectedFile = file;
-            
-            console.log("File selected:", file.name, file.type, file.size);
             
             // Display the selected image in the upload area
             const uploadArea = document.getElementById('upload-area');
@@ -699,373 +661,292 @@
             
             const img = document.createElement('img');
             img.src = URL.createObjectURL(file);
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '200px';
+            img.className = 'upload-preview';
             uploadArea.appendChild(img);
             
             const p = document.createElement('p');
-            p.textContent = file.name;
+            p.textContent = `Selected: ${file.name}`;
+            p.style.fontSize = '12px';
             uploadArea.appendChild(p);
+            
+            // Enable upload button
+            document.getElementById('upload-button').disabled = false;
+            document.getElementById('upload-button').textContent = 'Upload to Grid!';
         }
         
-        // Tokenization process
-        function startTokenization() {
-            console.log("Starting tokenization function");
-            
+        // Upload image to Firebase and add to grid
+        function uploadImage() {
             if (!selectedFile) {
                 alert('Please select an image first.');
                 return;
             }
             
-            const nameInput = document.getElementById('memecoin-name');
-            const tickerInput = document.getElementById('memecoin-ticker');
+            const uploaderName = document.getElementById('uploader-name').value || 'Anonymous';
+            const progressContainer = document.getElementById('progress-container');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const uploadButton = document.getElementById('upload-button');
             
-            if (!nameInput.value) {
-                alert('Please enter a name for your memecoin.');
-                return;
-            }
+            // Show progress
+            progressContainer.style.display = 'block';
+            uploadButton.disabled = true;
+            uploadButton.textContent = 'Uploading...';
             
-            if (!tickerInput.value) {
-                alert('Please enter a ticker symbol for your memecoin.');
-                return;
-            }
-
-            console.log("Starting tokenization process");
+            const timestamp = new Date().getTime();
+            const filename = `${timestamp}_${selectedFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            const storageRef = storage.ref(`pixels/${filename}`);
             
-            // Show processing overlay
-            const overlay = document.getElementById('processing-overlay');
-            overlay.style.display = 'flex';
+            // Upload file
+            const uploadTask = storageRef.put(selectedFile);
             
-            // Simulate processing
-            simulateProcessing()
-                .then(() => {
-                    // Upload to Firebase
-                    console.log("Processing complete, uploading to Firebase");
-                    return uploadToFirebase(selectedFile, nameInput.value, tickerInput.value);
-                })
-                .then(() => {
-                    console.log("Upload successful");
-                    // Show success dialog
-                    hideDialog('success-dialog');
-                    document.getElementById('success-dialog').style.display = 'block';
-                    
-                    // Reset form
-                    selectedFile = null;
-                    const fileInput = document.getElementById('file-input');
-                    if (fileInput) fileInput.value = '';
-                    nameInput.value = '';
-                    tickerInput.value = '';
-                    document.getElementById('upload-area').innerHTML = '<p>Click here to upload an image</p>';
-                    
-                    // Refresh queue
-                    loadQueueFromFirebase();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred: ' + error.message);
-                });
-        }
-        
-        // Simulate processing with progress updates
-        function simulateProcessing() {
-            return new Promise((resolve) => {
-                const progress = document.getElementById('processing-progress');
-                const status = document.getElementById('processing-status');
-                const doneButton = document.getElementById('processing-done-button');
-                
-                const steps = [
-                    { value: 10, message: 'Connecting to Solana blockchain...' },
-                    { value: 25, message: 'Generating smart contract...' },
-                    { value: 40, message: 'Creating token metadata...' },
-                    { value: 60, message: 'Allocating token supply...' },
-                    { value: 75, message: 'Verifying on-chain data...' },
-                    { value: 90, message: 'Finalizing tokenization...' },
-                    { value: 100, message: 'Memecoin successfully queued!' }
-                ];
-                
-                let currentStep = 0;
-                
-                const interval = setInterval(() => {
-                    if (currentStep < steps.length) {
-                        progress.value = steps[currentStep].value;
-                        status.textContent = steps[currentStep].message;
-                        currentStep++;
-                    } else {
-                        clearInterval(interval);
-                        doneButton.disabled = false;
-                        doneButton.textContent = 'Done';
-                        resolve();
-                    }
-                }, 500);
-            });
-        }
-        
-        // Improved Upload to Firebase with better error handling
-        function uploadToFirebase(file, name, ticker) {
-            return new Promise((resolve, reject) => {
-                console.log("Starting Firebase upload");
-                
-                const timestamp = new Date().getTime();
-                const filename = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-                const storageRef = storage.ref(`memecoins/${filename}`);
-                
-                console.log("Storage reference created:", storageRef.fullPath);
-                
-                // Upload file
-                const uploadTask = storageRef.put(file);
-                
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        // Log progress
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log('Upload progress:', progress.toFixed(2) + '%');
-                    },
-                    (error) => {
-                        console.error('Upload error:', error);
-                        reject(error);
-                    },
-                    () => {
-                        console.log('Upload completed successfully');
-                        // Get download URL
-                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                            console.log('File available at:', downloadURL);
-                            
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    progressFill.style.width = progress + '%';
+                    progressText.textContent = `Uploading... ${Math.round(progress)}%`;
+                },
+                (error) => {
+                    console.error('Upload error:', error);
+                    alert('Upload failed: ' + error.message);
+                    resetUploadForm();
+                },
+                () => {
+                    // Get download URL and save to Firestore
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        // Find an empty pixel
+                        findEmptyPixel().then(pixelIndex => {
                             // Save to Firestore
-                            console.log('Saving to Firestore...');
-                            db.collection('memecoins').add({
-                                name: name,
-                                ticker: ticker,
+                            db.collection('pixels').add({
                                 imageUrl: downloadURL,
+                                uploaderName: uploaderName,
                                 timestamp: timestamp,
-                                status: 'queued'
+                                pixelIndex: pixelIndex
                             })
                             .then(() => {
-                                console.log('Firestore document created successfully');
-                                resolve();
+                                progressText.textContent = 'Success!';
+                                
+                                // Show success dialog
+                                document.getElementById('pixel-number').textContent = pixelIndex;
+                                document.getElementById('success-dialog').style.display = 'block';
+                                
+                                // Reset form
+                                resetUploadForm();
+                                
+                                // Refresh grid
+                                loadPixelsFromFirebase();
                             })
                             .catch((error) => {
                                 console.error('Firestore error:', error);
-                                reject(error);
+                                alert('Failed to save: ' + error.message);
+                                resetUploadForm();
                             });
-                        }).catch(error => {
-                            console.error('Error getting download URL:', error);
-                            reject(error);
                         });
+                    });
+                }
+            );
+        }
+        
+        function resetUploadForm() {
+            selectedFile = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('uploader-name').value = '';
+            document.getElementById('upload-area').innerHTML = `
+                <p>📁 Click here to upload an image</p>
+                <p style="font-size: 12px; color: #666;">Or drag and drop an image here</p>
+            `;
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('upload-button').disabled = true;
+            document.getElementById('upload-button').textContent = 'Select an image first';
+        }
+        
+        // Find an empty pixel randomly
+        function findEmptyPixel() {
+            return new Promise((resolve) => {
+                db.collection('pixels').get().then((querySnapshot) => {
+                    const usedPixels = new Set();
+                    querySnapshot.forEach((doc) => {
+                        usedPixels.add(doc.data().pixelIndex);
+                    });
+                    
+                    const totalPixels = 6000; // 100x60 grid
+                    const availablePixels = [];
+                    
+                    for (let i = 0; i < totalPixels; i++) {
+                        if (!usedPixels.has(i)) {
+                            availablePixels.push(i);
+                        }
                     }
-                );
+                    
+                    if (availablePixels.length === 0) {
+                        alert('Grid is full! No more pixels available.');
+                        return;
+                    }
+                    
+                    const randomIndex = Math.floor(Math.random() * availablePixels.length);
+                    resolve(availablePixels[randomIndex]);
+                });
             });
         }
         
-        // Load queue from Firebase
-        function loadQueueFromFirebase() {
-            console.log("Loading queue from Firebase");
-            
-            const queueGrid = document.getElementById('queue-grid');
-            const queueCount = document.getElementById('queue-count');
+        // Load pixels from Firebase and update grid
+        function loadPixelsFromFirebase() {
             const desktopPixels = document.getElementById('desktop-pixels');
+            const taskbarStatus = document.getElementById('taskbar-status');
             
-            // Clear current grid and pixels
-            queueGrid.innerHTML = '';
+            // Clear current pixels
             desktopPixels.innerHTML = '';
             
-            // Create a single tooltip element that will be reused
-            let globalTooltip = document.getElementById('pixel-tooltip');
-            if (!globalTooltip) {
-                globalTooltip = document.createElement('div');
-                globalTooltip.className = 'pixel-tooltip';
-                globalTooltip.id = 'pixel-tooltip';
-                document.body.appendChild(globalTooltip);
+            // Create all empty pixels first
+            const totalPixels = 6000; // 100x60 grid
+            for (let i = 0; i < totalPixels; i++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                pixel.setAttribute('data-index', i);
+                desktopPixels.appendChild(pixel);
             }
+            
+            // Create tooltip
+            let globalTooltip = document.getElementById('pixel-tooltip');
             
             // Hide tooltip when clicking anywhere
             document.addEventListener('click', function() {
                 globalTooltip.style.display = 'none';
             });
             
-            // Total number of coins we want to display
-            const totalCoins = 400;
-            
-            // Get queue items from Firestore
-            db.collection('memecoins')
-                .orderBy('timestamp', 'desc')
-                .limit(totalCoins)
+            // Get filled pixels from Firestore
+            db.collection('pixels')
+                .orderBy('timestamp', 'asc')
                 .get()
                 .then((querySnapshot) => {
-                    console.log(`Found ${querySnapshot.size} items in queue`);
-                    queueCount.textContent = querySnapshot.size;
-                    
-                    // Create filled items for the queue window
-                    querySnapshot.forEach((doc, index) => {
-                        const data = doc.data();
-                        
-                        // Create pump.fun style list item
-                        const queueItem = document.createElement('div');
-                        queueItem.className = 'queue-item filled';
-                        queueItem.setAttribute('data-position', index);
-                        
-                        const timeEl = document.createElement('div');
-                        timeEl.className = 'queue-item-time';
-                        const timeAgo = getTimeAgo(data.timestamp);
-                        timeEl.textContent = timeAgo;
-                        queueItem.appendChild(timeEl);
-                        
-                        const img = document.createElement('img');
-                        img.className = 'queue-item-image';
-                        img.src = data.imageUrl;
-                        img.onerror = function() {
-                            this.src = 'https://img.icons8.com/ios-filled/50/no-image.png';
-                        };
-                        queueItem.appendChild(img);
-                        
-                        const infoDiv = document.createElement('div');
-                        infoDiv.className = 'queue-item-info';
-                        
-                        const nameEl = document.createElement('div');
-                        nameEl.className = 'queue-item-name';
-                        nameEl.textContent = data.name;
-                        infoDiv.appendChild(nameEl);
-                        
-                        const tickerEl = document.createElement('div');
-                        tickerEl.className = 'queue-item-ticker';
-                        tickerEl.textContent = data.ticker.toUpperCase();
-                        infoDiv.appendChild(tickerEl);
-                        
-                        queueItem.appendChild(infoDiv);
-                        
-                        // Add CA: PENDING... text
-                        const caEl = document.createElement('div');
-                        caEl.className = 'queue-item-ca';
-                        caEl.textContent = 'CA: PENDING...';
-                        queueItem.appendChild(caEl);
-                        
-                        queueGrid.appendChild(queueItem);
-                    });
-                    
-                    // Fill the rest with empty items for the queue
-                    for (let i = 0; i < totalCoins - querySnapshot.size; i++) {
-                        const position = querySnapshot.size + i;
-                        
-                        // Empty queue item
-                        const emptyItem = document.createElement('div');
-                        emptyItem.className = 'queue-item empty';
-                        emptyItem.setAttribute('data-position', position);
-                        
-                        const timeEl = document.createElement('div');
-                        timeEl.className = 'queue-item-time';
-                        timeEl.textContent = '...';
-                        emptyItem.appendChild(timeEl);
-                        
-                        const placeholderImg = document.createElement('div');
-                        placeholderImg.className = 'queue-item-image';
-                        placeholderImg.style.backgroundColor = '#333';
-                        emptyItem.appendChild(placeholderImg);
-                        
-                        const infoDiv = document.createElement('div');
-                        infoDiv.className = 'queue-item-info';
-                        
-                        const nameEl = document.createElement('div');
-                        nameEl.className = 'queue-item-name';
-                        nameEl.textContent = 'Waiting for submission...';
-                        infoDiv.appendChild(nameEl);
-                        
-                        const tickerEl = document.createElement('div');
-                        tickerEl.className = 'queue-item-ticker';
-                        tickerEl.textContent = '???';
-                        infoDiv.appendChild(tickerEl);
-                        
-                        emptyItem.appendChild(infoDiv);
-                        
-                        // Add CA: PENDING... text for empty items too
-                        const caEl = document.createElement('div');
-                        caEl.className = 'queue-item-ca';
-                        caEl.textContent = 'CA: PENDING...';
-                        caEl.style.color = '#444'; // Dimmer for empty items
-                        emptyItem.appendChild(caEl);
-                        
-                        queueGrid.appendChild(emptyItem);
-                    }
-                    
-                    // Create all empty pixels first
-                    const totalPixels = 100 * 60; // 6000 pixels in a 100x60 grid
-                    for (let i = 0; i < totalPixels; i++) {
-                        const pixel = document.createElement('div');
-                        pixel.className = 'pixel';
-                        pixel.setAttribute('data-index', i);
-                        desktopPixels.appendChild(pixel);
-                    }
-                    
-                    // Now place filled pixels randomly
                     const allPixels = document.querySelectorAll('.pixel');
-                    const usedPositions = new Set();
-                    const maxPosition = totalPixels - 1;
+                    let filledCount = 0;
                     
-                    // For each memecoin, assign a random position
-                    querySnapshot.forEach((doc, index) => {
+                    querySnapshot.forEach((doc) => {
                         const data = doc.data();
+                        const pixelIndex = data.pixelIndex;
                         
-                        // Find an unused random position
-                        let randomPosition;
-                        do {
-                            randomPosition = Math.floor(Math.random() * maxPosition);
-                        } while (usedPositions.has(randomPosition));
-                        
-                        usedPositions.add(randomPosition);
-                        
-                        // Get the corresponding pixel element
-                        const pixelElement = allPixels[randomPosition];
-                        
-                        // Mark it as filled
-                        pixelElement.className = 'pixel filled';
-                        pixelElement.style.backgroundImage = `url(${data.imageUrl})`;
-                        pixelElement.setAttribute('data-name', data.name);
-                        pixelElement.setAttribute('data-ticker', data.ticker.toUpperCase());
-                        pixelElement.setAttribute('data-image', data.imageUrl);
-                        
-                        // Add click handler for tooltip
-                        pixelElement.addEventListener('click', function(e) {
-                            // Prevent event bubbling
-                            e.stopPropagation();
+                        if (pixelIndex < totalPixels) {
+                            const pixelElement = allPixels[pixelIndex];
                             
-                            // Update tooltip content
-                            globalTooltip.innerHTML = '';
+                            // Mark as filled
+                            pixelElement.className = 'pixel filled';
+                            pixelElement.style.backgroundImage = `url(${data.imageUrl})`;
+                            pixelElement.setAttribute('data-uploader', data.uploaderName);
+                            pixelElement.setAttribute('data-timestamp', data.timestamp);
+                            pixelElement.setAttribute('data-image', data.imageUrl);
                             
-                            const tooltipImg = document.createElement('img');
-                            tooltipImg.src = this.getAttribute('data-image');
-                            tooltipImg.onerror = function() {
-                                this.src = 'https://img.icons8.com/ios-filled/50/no-image.png';
-                            };
-                            globalTooltip.appendChild(tooltipImg);
+                            // Add click handler for tooltip
+                            pixelElement.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                
+                                // Update tooltip content
+                                globalTooltip.innerHTML = '';
+                                
+                                const tooltipImg = document.createElement('img');
+                                tooltipImg.src = this.getAttribute('data-image');
+                                tooltipImg.onerror = function() {
+                                    this.src = 'https://img.icons8.com/ios-filled/50/no-image.png';
+                                };
+                                globalTooltip.appendChild(tooltipImg);
+                                
+                                const tooltipName = document.createElement('div');
+                                tooltipName.className = 'pixel-tooltip-name';
+                                tooltipName.textContent = `Pixel #${pixelIndex}`;
+                                globalTooltip.appendChild(tooltipName);
+                                
+                                const tooltipUploader = document.createElement('div');
+                                tooltipUploader.className = 'pixel-tooltip-uploader';
+                                tooltipUploader.textContent = `By: ${this.getAttribute('data-uploader')}`;
+                                globalTooltip.appendChild(tooltipUploader);
+                                
+                                const tooltipTime = document.createElement('div');
+                                tooltipTime.className = 'pixel-tooltip-time';
+                                const timestamp = parseInt(this.getAttribute('data-timestamp'));
+                                tooltipTime.textContent = `Uploaded: ${new Date(timestamp).toLocaleDateString()}`;
+                                globalTooltip.appendChild(tooltipTime);
+                                
+                                // Position tooltip
+                                globalTooltip.style.display = 'block';
+                                const x = Math.min(e.clientX + 10, window.innerWidth - 320);
+                                const y = Math.min(e.clientY + 10, window.innerHeight - 350);
+                                globalTooltip.style.left = x + 'px';
+                                globalTooltip.style.top = y + 'px';
+                            });
                             
-                            const tooltipName = document.createElement('div');
-                            tooltipName.className = 'pixel-tooltip-name';
-                            tooltipName.textContent = this.getAttribute('data-name');
-                            globalTooltip.appendChild(tooltipName);
-                            
-                            const tooltipTicker = document.createElement('div');
-                            tooltipTicker.className = 'pixel-tooltip-ticker';
-                            tooltipTicker.textContent = this.getAttribute('data-ticker');
-                            globalTooltip.appendChild(tooltipTicker);
-                            
-                            const tooltipCA = document.createElement('div');
-                            tooltipCA.className = 'pixel-tooltip-ca';
-                            tooltipCA.textContent = 'CA: QUEUED...';
-                            globalTooltip.appendChild(tooltipCA);
-                            
-                            // Position tooltip near click
-                            globalTooltip.style.display = 'block';
-                            
-                            // Position near click but ensure it stays on screen
-                            const x = Math.min(e.clientX, window.innerWidth - 320);
-                            const y = Math.min(e.clientY, window.innerHeight - 350);
-                            
-                            globalTooltip.style.left = x + 'px';
-                            globalTooltip.style.top = y + 'px';
-                        });
+                            filledCount++;
+                        }
                     });
+                    
+                    // Update taskbar status
+                    taskbarStatus.textContent = `Pixels filled: ${filledCount}/${totalPixels}`;
+                    
+                    console.log(`Loaded ${filledCount} filled pixels`);
                 })
                 .catch((error) => {
-                    console.error('Error getting queue:', error);
+                    console.error('Error loading pixels:', error);
                 });
+        }
+        
+        // Load statistics
+        function loadStatsFromFirebase() {
+            const now = new Date().getTime();
+            const oneDayAgo = now - (24 * 60 * 60 * 1000);
+            
+            db.collection('pixels').get().then((querySnapshot) => {
+                const totalFilled = querySnapshot.size;
+                const totalPixels = 6000;
+                const completionPercent = Math.round((totalFilled / totalPixels) * 100);
+                
+                // Count unique uploaders
+                const uploaders = new Set();
+                let recentUploads = 0;
+                const recentActivity = [];
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    uploaders.add(data.uploaderName);
+                    
+                    if (data.timestamp > oneDayAgo) {
+                        recentUploads++;
+                    }
+                    
+                    recentActivity.push({
+                        uploader: data.uploaderName,
+                        timestamp: data.timestamp,
+                        pixelIndex: data.pixelIndex
+                    });
+                });
+                
+                // Update stats display
+                document.getElementById('filled-count').textContent = totalFilled;
+                document.getElementById('completion-percent').textContent = completionPercent + '%';
+                document.getElementById('total-uploaders').textContent = uploaders.size;
+                document.getElementById('recent-uploads').textContent = recentUploads;
+                
+                // Update recent activity
+                const recentActivityDiv = document.getElementById('recent-activity');
+                recentActivity.sort((a, b) => b.timestamp - a.timestamp);
+                recentActivityDiv.innerHTML = '';
+                
+                recentActivity.slice(0, 10).forEach(activity => {
+                    const activityItem = document.createElement('div');
+                    activityItem.style.marginBottom = '5px';
+                    activityItem.style.paddingBottom = '5px';
+                    activityItem.style.borderBottom = '1px solid #ccc';
+                    
+                    const timeAgo = getTimeAgo(activity.timestamp);
+                    activityItem.innerHTML = `
+                        <strong>${activity.uploader}</strong> filled pixel #${activity.pixelIndex} 
+                        <span style="color: #666;">${timeAgo}</span>
+                    `;
+                    recentActivityDiv.appendChild(activityItem);
+                });
+                
+                if (recentActivity.length === 0) {
+                    recentActivityDiv.innerHTML = '<em>No uploads yet. Be the first!</em>';
+                }
+            });
         }
         
         // Helper function to format time ago
@@ -1074,16 +955,16 @@
             const diff = now - timestamp;
             
             const seconds = Math.floor(diff / 1000);
-            if (seconds < 60) return `${seconds}s`;
+            if (seconds < 60) return `${seconds}s ago`;
             
             const minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return `${minutes}m`;
+            if (minutes < 60) return `${minutes}m ago`;
             
             const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `${hours}h`;
+            if (hours < 24) return `${hours}h ago`;
             
             const days = Math.floor(hours / 24);
-            return `${days}d`;
+            return `${days}d ago`;
         }
         
         // Dialogs
@@ -1093,15 +974,18 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM loaded, initializing app");
+            console.log("DOM loaded, initializing pixel grid");
             
-            // Open TokenMaker by default
-            openWindow('tokenmaker');
+            // Open upload window by default
+            openWindow('upload');
             
-            // Load queue
-            loadQueueFromFirebase();
+            // Load existing pixels
+            loadPixelsFromFirebase();
             
-            console.log("App initialization complete");
+            // Load initial stats
+            loadStatsFromFirebase();
+            
+            console.log("Pixel grid initialization complete");
         });
     </script>
 </body>
